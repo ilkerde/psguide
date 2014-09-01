@@ -153,7 +153,7 @@ Example:
 
 **Powershell is graceful.** Be explicit during development, be merciful during usage.
 
-* Do not use aliases for commands (cmdlets) except those in the (list of aliases to prefer)[#list-of-usable-aliases]
+* Do not use aliases for commands (cmdlets) except those in the [list of aliases to prefer](#list-of-usable-aliases)
 * Call functions with positional parameters first if supported.
 * Fallback to named version on positional parameters for clarification.
 * Do not abbreviate named parameters.
