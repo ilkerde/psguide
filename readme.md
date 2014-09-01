@@ -153,7 +153,7 @@ Example:
 
 **Powershell is graceful.** Be explicit during development, be merciful during usage.
 
-* Never use aliases for commands (cmdlets).
+* Do not use aliases for commands (cmdlets) except those in the (list of aliases to prefer)[#list-of-usable-aliases]
 * Call functions with positional parameters first if supported.
 * Fallback to named version on positional parameters for clarification.
 * Do not abbreviate named parameters.
@@ -211,14 +211,22 @@ _Note: Consult the Powershell documentation on what is possible with inline help
 
 ### Idioms
 
-#### Use `%{}` and `?{}` aliases
+#### List of usable aliases
 
-Always prefer single character aliases for `Foreach-Object` and `Where-Object`. These are the only exceptions to the otherwise explicit call style.
+There are in fact a few commands where using their alias counterpart does improve readability and terseness of code.
+
+You should prefer to
+
+* use `foreach` instead of `Foreach-Object`
+* use `where` instead of `Where-Object`
+* use `sort` instead of `Sort-Object`
+* use `group` instead of `Group-Object`
+* use `select` instead of `Select-Object`
 
 Example:
 
     # Good - use this:
-    $files | ?{ $_ -like '*.zip' } | %{ Copy-Item $_ Z:\archive\$_ -Recurse -Force }
+    $files | where { $_ -like '*.zip' } | foreach { Copy-Item $_ Z:\archive\$_ -Recurse -Force }
 
     # Bad - avoid this:
     $files | Where-Object { $_ -like '*.zip' } | Foreach-Object { Copy-Item $_ Z:\archive\$_ -Recurse -Force }
@@ -246,8 +254,8 @@ Example:
 
     # Good - hash values:
     $hash = @{
-        orders = 2;
-        runtime = 'new';
+        orders = 2
+        runtime = 'new'
         colors = $colors
     }
 
@@ -289,6 +297,31 @@ For path parameters, prefer to use `string[]` in order to signal participation i
 #### Avoid setting preferences
 
 Never try to set preferences of Powershell in your scripts, especially keep hands off from `$ErrorActionPreference`!
+
+#### Use splats for long parameter lists
+
+Prefer splats if you have a long list of parameters to be passed to a function.
+
+Example:
+
+    # Good - splat parameters
+    $parameters = @{
+        Source = C:\temp
+        Destination = D:\backup\databases
+        KeepData = $false
+        VersionSchema = $true
+        NotificationLevel = Error
+    }
+
+    Backup-RuntimeData @parameters
+
+    # Bad - backtick into new lines
+    Backup-RuntimeData `
+        -Source C:\temp `
+        -Destination D:\backup\databases `
+        -KeepData $false `
+        -VersionSchema $true `
+        -NotificationLevel Error
 
 ### Remarks
 
