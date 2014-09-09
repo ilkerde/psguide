@@ -40,8 +40,9 @@ Example:
 * Private variables are always camel-cased.
 * Named parameters are always pascal-cased.
 * Known type names are always lowercased.
+* Type accelerators are always lowercased.
 * Functions do not use _Verb-Noun_ convention if they are not intended to be used in command line.
-* Variables do not encompass type information in their name.
+* Variables do not encompass type information in their name (no hungarian notation).
 
 Example:
 
@@ -211,7 +212,7 @@ _Note: Consult the Powershell documentation on what is possible with inline help
 
 ### Idioms
 
-#### List of usable aliases
+#### Use aliases for iteration and projection
 
 There are in fact a few commands where using their alias counterpart does improve readability and terseness of code.
 
@@ -259,6 +260,18 @@ Example:
         colors = $colors
     }
 
+#### Create custom objects using PS3 type accelerator
+
+Use `[pscustomobject]` type accelerator to create custom objects. If Powershell version 3 is not available, fallback to `New-Object psobject -property` syntax.
+
+Example:
+
+    $custom = [pscustomobject]@{
+        Id = 8
+        Name = 'John'
+        Roles = @('User', 'Developer', 'BackupAdmin')
+    }
+
 #### Use PS3 automatics if possible
 
 Prefer the automatic variables provided by Powershell version 3 if possible.
@@ -276,15 +289,16 @@ Example:
 
 #### Use type accelerators for object creation if possible
 
-Type accelerators are awesome. Use the default type accelerators.
+Type accelerators are awesome. Use the default type accelerators if possible.
 
 Example:
 
-    [datetime]$date = '01/01/1970'
-    [mailaddress]$email = 'john.doe@example.com'
-    [regex]$rx = '^H(i|o).*$'
-    [xml]$document = Get-Content doc.xml
-    [version]$v = '1.4.1534'
+    $date = [datetime]'01/01/1970'
+    $email = [mailaddress]'john.doe@example.com'
+    $rx = [regex]'^H(i|o).*$'
+    $doc = [xml]Get-Content doc.xml
+    $v = [version]'1.4.1534'
+    $obj = [pscustomobject]@{ Key = 'A'; Value = 1 }
 
 #### Avoid `Write-Host` in functions
 
@@ -326,6 +340,16 @@ Example:
 ### Remarks
 
 This "guideline" was written because I did not find any Powershell coding or scripting guidelines out there. It is by far not complete or perfect. As always with guidelines, the most important thing is _consistency_. Remember: style is debatable, consistency is not. I happen to be an irregular Powershell user and scripter for a few years now, but just recently got into more "serious" Powershell scripting. If you have any suggestions, feel free to fork, change and open a pull request.
+
+### Changelog
+
+    1.0.2   09/09/2014    Enhance type accelerators example
+                          Use [pscustomobject] for custom objects
+
+    1.0.1   09/01/2014    Favor *-Object aliases
+                          Use splats for large parameter lists
+
+    1.0     07/01/2014    Initial Release.
 
 _(c) 2014 Ilker Cetinkaya, MIT License._
 
