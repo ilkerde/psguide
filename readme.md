@@ -33,6 +33,7 @@ Example:
 **Powershell is case-insensitive.** This requires a consistent casing and naming style.
 
 * Language keywords are always lowercased.
+* Aliases are always lowercased.
 * Only commands (cmdlets) always follow _Verb-Noun_ convention.
 * Public functions are always pascal-cased.
 * Public variables are always pascal-cased.
@@ -123,6 +124,7 @@ Example:
 * Every parameter is defined on a separate line (at least).
 * Parameters are always annotated with expected types.
 * Always `return` from a function explicitly if it has something to return.
+* You _may_ omit the `return` statement if the entire script block is a single-lined (short) expression.
 
 Example:
 
@@ -145,16 +147,17 @@ Example:
         # Save configuration here
     }
 
-    # Bad - avoid this:
-    filter Even {
-        if ($_ % 2 -eq 0) { $_ }
+    # Ok - if short expression, you may omit return:
+    Assert-MockCalled MyFunction -ParameterFilter {
+        $Name -eq 'Test'
     }
 
 ### Call Style
 
 **Powershell is graceful.** Be explicit during development, be merciful during usage.
 
-* Do not use aliases for commands (cmdlets) except those in the [list of aliases to prefer](#list-of-usable-aliases)
+* Do not use aliases for commands (cmdlets) except those in the [list of aliases to prefer](#list-of-usable-aliases).
+* For custom DSLs (i.e. Psake), prefer aliases all lowercased.
 * Call functions with positional parameters first if supported.
 * Fallback to named version on positional parameters for clarification.
 * Do not abbreviate named parameters.
@@ -173,12 +176,19 @@ Example:
     # Bad - avoid this:
     cp -r $from $to
 
+    # Ok - Custom DSL alias:
+    describe 'DSL' {
+        context 'Guideline' {
+            it 'is ok to use aliases (all lowercased)' {}
+        }
+    }
+
 ### Documentation Style
 
 **Powershell is well-documented.** Document your commands.
 
-* Always document your commands using inline help.
-* Avoid externalizing your help to MAML, except you want to provide multiple cultures.
+* If documenting, always document your commands using inline help.
+* For extensive or exhaustive documentation, consider externalizing your help to MAML.
 * Prefer single line comments for inline commentary.
 
 Example:
@@ -234,7 +244,7 @@ Example:
 
 #### Use shorthands for arrays and hashes
 
-Always use the shorthand syntax for arrays and hashes where appropiate.
+Always use the shorthand syntax for arrays and hashes where appropiate. Prefer to initialize hashes over multiple lines for multiple key/value pairs.
 
 Example:
 
@@ -304,9 +314,23 @@ Example:
 
 Just prefer `Write-Output` over `Write-Host`. Only use `Write-Host` if you know that your function is not going to be reused.
 
-#### Prefer `string[]` over `string` for paths
+#### Prefer `string[]` over `string` for path parameters
 
 For path parameters, prefer to use `string[]` in order to signal participation in batch processing.
+
+#### Avoid `bool` in favor of `switch` for flag parameters
+
+Do not use `[bool]` for flag parameters. Use `[switch]` instead. Always place switches at the end of the parameters list.
+
+Example:
+
+    # Good - use switches instead of bools for flag params
+    function GetServiceUrl {
+        param (
+            [string] $Domain,
+            [switch] $UseSSL
+        )
+    }
 
 #### Avoid setting preferences
 
@@ -342,6 +366,10 @@ Example:
 This "guideline" was written because I did not find any Powershell coding or scripting guidelines out there. It is by far not complete or perfect. As always with guidelines, the most important thing is _consistency_. Remember: style is debatable, consistency is not. I happen to be an irregular Powershell user and scripter for a few years now, but just recently got into more "serious" Powershell scripting. If you have any suggestions, feel free to fork, change and open a pull request.
 
 ### Changelog
+
+    1.0.3   12/09/2014    Restate MAML documentation preference
+                          Explicitly address custom DSL alias usage
+                          Add [switch] over [bool] param idiom
 
     1.0.2   09/09/2014    Enhance type accelerators example
                           Use [pscustomobject] for custom objects
